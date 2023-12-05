@@ -1,16 +1,43 @@
-# This is a sample Python script.
+import streamlit as st
+import http.client
+import json
+from Player import Player_Info
+import pandas as pd
+import numpy as np
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+def inputHandler(name):
+    normInput = ""
+    for c in name:
+        if c == " ":
+            c = "_"
+        normInput += c
+    return normInput
+
+def searchPlayer(name):
+    if name == "":
+        st.write()
+        return
+    conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
+
+    headers = {
+        'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
+        'X-RapidAPI-Host': "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
+    }
+
+    conn.request("GET", f"/getNFLPlayerInfo?playerName={name}&getStats=true", headers=headers)
+
+    res = conn.getresponse()
+    data = res.read().decode("utf-8")  # Decode the response to a string
+    parsed_data = json.loads(data)
+
+    if "error" in parsed_data:
+        st.write("Player not found")
+    else:
+        st.write(parsed_data)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+st.text_input("Player name", key="name")
 
+name = inputHandler(st.session_state.name)
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+searchPlayer(name)
