@@ -13,7 +13,7 @@ def inputHandler(name):
         normInput += c
     return normInput
 
-def searchPlayer(name):
+def pullPlayer(name):
     if name == "":
         st.write()
         return
@@ -28,16 +28,20 @@ def searchPlayer(name):
 
     res = conn.getresponse()
     data = res.read().decode("utf-8")  # Decode the response to a string
-    parsed_data = json.loads(data)
-
-    if "error" in parsed_data:
+    player = Player_Info.from_api_response(data)
+    if player.name is None:
         st.write("Player not found")
     else:
-        st.write(parsed_data)
+        st.write(player.name)
+        st.write(player.school)
+        st.image(player.headshot)
 
+if __name__ == '__main__':
 
-st.text_input("Player name", key="name")
+    st.title("NFL Data Visualizer")
 
-name = inputHandler(st.session_state.name)
+    st.text_input("Player name", key="name")
 
-searchPlayer(name)
+    name = inputHandler(st.session_state.name)
+
+    pullPlayer(name)
