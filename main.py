@@ -2,6 +2,7 @@ import http.client
 import json
 from Player import Player_Info
 import pandas as pd
+import numpy as np
 
 def validPlayer(name):
     conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
@@ -18,7 +19,6 @@ def validPlayer(name):
         return False
     else:
         return True
-
 
 def inputHandler(name):
     normInput = ""
@@ -88,8 +88,6 @@ def pullFantasyInfo(player):
 
     parsed_data = json.loads(data)
 
-    print(parsed_data)
-
     player_games = []
 
     seen_games = set()
@@ -101,15 +99,14 @@ def pullFantasyInfo(player):
         player_games.append(game_ID)
 
     for game in team_games:
-        if game in player_games:
+        if game in player_games:  # handles games where points accrued
             game_points = float(parsed_data["body"][game]["fantasyPointsDefault"]["PPR"])
             fantasy_points.append(game_points)
             seen_games.add(game)
-        else:
+        elif game == np.NaN:  # handles bye weeks
+            fantasy_points.append(np.NaN)
+        else:  # handles games where no points accrued
             fantasy_points.append(0.0)
-
-    for val in fantasy_points:
-        print(str(val) + " ")
 
     for game in player_games:
         if game not in seen_games:
@@ -141,17 +138,28 @@ def storeTeamGames(teamAbv):
 
     team_games = []
 
+    game_weeks = []
+
 
     for game_data in parsed_data["body"]["schedule"]:
-        game_ID = game_data.get("gameID")
-        game_week = game_data.get("gameWeek")[6:]
         game_type = game_data.get("seasonType")
         game_status = game_data.get("gameStatus")
-        #  if (game_type == "Regular Season") and (game_status == "Completed"):
-            #  team_games.append((game_week, game_ID))
 
-        if (game_type == "Regular Season") and (game_status == "Completed"):
+        if (game_type == "Regular Season"):
+            game_ID = game_data.get("gameID")
             team_games.append(game_ID)
+            game_week = int(game_data.get("gameWeek")[5:])
+            game_weeks.append(game_week)
+
+    for i in range(len(game_weeks) - 1):
+        if game_weeks[i] == game_weeks[i + 1]:
+            del team_games[i + 2]
+            continue
+        if (game_weeks[i] + 1) != (game_weeks[i + 1]):
+            team_games.insert(i + 1, np.NaN)
+
+    for val in team_games:
+        print(str(val) + " ")
 
     return team_games
 
