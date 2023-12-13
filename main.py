@@ -1,9 +1,7 @@
-import streamlit as st
 import http.client
 import json
 from Player import Player_Info
 import pandas as pd
-import numpy as np
 
 def validPlayer(name):
     conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
@@ -32,7 +30,6 @@ def inputHandler(name):
 
 def pullPlayer(name):
     if name == "":
-        st.write()
         return
     conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
 
@@ -47,10 +44,11 @@ def pullPlayer(name):
     data = res.read().decode("utf-8")  # Decode the response to a string
 
     player = Player_Info.from_api_response(data)
+
     return player
 
 
-def pullFantasyInfo(ID):
+def pullFantasyInfo(player):
     conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
 
     headers = {
@@ -59,7 +57,9 @@ def pullFantasyInfo(ID):
     }
 
     conn.request("GET",
-                 f"/getNFLGamesForPlayer?playerID={ID}&fantasyPoints=true&twoPointConversions=2&passYards=.04&passTD=4&passInterceptions=-2&pointsPerReception=1&carries=.2&rushYards=.1&rushTD=6&fumbles=-2&receivingYards=.1&receivingTD=6&targets=0&defTD=6",
+                 f"/getNFLGamesForPlayer?playerID={player.ID}&fantasyPoints=true&twoPointConversions=2&passYards=.04&"
+                 f"passTD=4&passInterceptions=-2&pointsPerReception=1&carries=.2&rushYards=.1&rushTD=6&fumbles=-2&"
+                 f"receivingYards=.1&receivingTD=6&targets=0&defTD=6",
                  headers=headers)
 
     res = conn.getresponse()
@@ -70,53 +70,82 @@ def pullFantasyInfo(ID):
 
     print(parsed_data)
 
+    team_games = storeTeamGames(player.team)  # list of team games stored as gameID strings
+    player_games = []
+
     for key in parsed_data["body"].keys():
-        game_ID = int(parsed_data["body"][key]["gameID"][0:8])
-        game_points = parsed_data["body"][key]["fantasyPointsDefault"]["PPR"]
-        if game_ID > 20230827:
-            fantasy_points.append(float(game_points))
+        game_ID = parsed_data["body"][key]["gameID"]
+        player_games.append(game_ID)
+
+    for ID in team_games:
+        if ID in player_games:
+            game_points = float(parsed_data["body"][ID]["fantasyPointsDefault"]["PPR"])
+            fantasy_points.append(game_points)
         else:
-            break
+            fantasy_points.append(0.0)
 
-    return fantasy_points
+    player.fantasy_points = fantasy_points
 
+def storeTeamGames(teamAbv):
+    conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
+
+    headers = {
+        'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
+        'X-RapidAPI-Host': "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
+    }
+
+    conn.request("GET", f"/getNFLTeamSchedule?teamAbv={teamAbv}&season=2023", headers=headers)
+
+    res = conn.getresponse()
+    data = res.read().decode("utf-8")
+    parsed_data = json.loads(data)
+
+    team_games = []
+
+    for game_data in parsed_data["body"]["schedule"]:
+        game_ID = game_data.get("gameID")
+        game_type = game_data.get("seasonType")
+        game_status = game_data.get("gameStatus")
+        if (game_type == "Regular Season") and (game_status == "Completed"):
+            team_games.append(game_ID)
+
+    return team_games
 
 
 
 if __name__ == '__main__':
 
-    st.title("NFL Data Visualizer")
+    window = True
 
-    st.text_input("Player name", key="name")
+    while window:
 
-    name = inputHandler(st.session_state.name)
+        user_input = input("Enter a player: ")
 
-    if validPlayer(name) is False:
-        if name == "":
-            st.write()
+        name = inputHandler(user_input)
+
+        if validPlayer(name) is False:
+
+            print("Player does not exist")
+
         else:
-            st.write("Player not found")
 
-    else:
+            player = pullPlayer(name)
 
-        player = pullPlayer(name)
+            if isinstance(player, Player_Info):
 
-        player.fantasy_points = pullFantasyInfo(player.ID)
+                pullFantasyInfo(player)
 
-        player.fantasy_points.reverse()
+                print(player.name)
 
-        st.write(player.name)
+                chart_data = pd.DataFrame(
+                    {
+                        "week": range(1, len(player.fantasy_points) + 1),
+                        "points": player.fantasy_points
+                    }
+                )
 
-        st.image(player.headshot)
+                for val in player.fantasy_points:
+                    print(str(val) + " ")
+            else:
+                print("Error: Player info retrieval failed")
 
-        chart_data = pd.DataFrame(
-            {
-                "week": range(1, len(player.fantasy_points) + 1),
-                "points": player.fantasy_points
-            }
-        )
-
-        for val in player.fantasy_points:
-            print(str(val) + " ")
-
-        st.scatter_chart(chart_data, x="week", y="points")
