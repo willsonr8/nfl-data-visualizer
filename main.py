@@ -47,6 +47,26 @@ def pullPlayer(name):
 
     return player
 
+def getGameWeek(game_ID):
+    import http.client
+
+    conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
+
+    headers = {
+        'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
+        'X-RapidAPI-Host': "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
+    }
+
+    conn.request("GET", f"/getNFLGameInfo?gameID={game_ID}", headers=headers)
+
+    res = conn.getresponse()
+    data = res.read().decode("utf-8")
+    parsed_data = json.loads(data)
+
+    game_week = int(parsed_data["body"]["gameWeek"][5:])
+
+    return game_week
+
 
 def pullFantasyInfo(player):
     conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
@@ -70,23 +90,40 @@ def pullFantasyInfo(player):
 
     print(parsed_data)
 
-    team_games = storeTeamGames(player.team)  # list of team games stored as gameID strings
     player_games = []
+
+    seen_games = set()
+
+    team_games = storeTeamGames(player.team)
 
     for key in parsed_data["body"].keys():
         game_ID = parsed_data["body"][key]["gameID"]
         player_games.append(game_ID)
 
-    for ID in team_games:
-        if ID in player_games:
-            game_points = float(parsed_data["body"][ID]["fantasyPointsDefault"]["PPR"])
+    for game in team_games:
+        if game in player_games:
+            game_points = float(parsed_data["body"][game]["fantasyPointsDefault"]["PPR"])
             fantasy_points.append(game_points)
+            seen_games.add(game)
         else:
             fantasy_points.append(0.0)
+
+    for val in fantasy_points:
+        print(str(val) + " ")
+
+    for game in player_games:
+        if game not in seen_games:
+
+            if int(game[0:8]) > 20230827:  # should be a way to clean this up
+                game_week = getGameWeek(game)
+
+                if game_week <= len(fantasy_points):
+                    fantasy_points[game_week - 1] = float(parsed_data["body"][game]["fantasyPointsDefault"]["PPR"])
 
     player.fantasy_points = fantasy_points
 
 def storeTeamGames(teamAbv):
+
     conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
 
     headers = {
@@ -100,12 +137,19 @@ def storeTeamGames(teamAbv):
     data = res.read().decode("utf-8")
     parsed_data = json.loads(data)
 
+    print(parsed_data)
+
     team_games = []
+
 
     for game_data in parsed_data["body"]["schedule"]:
         game_ID = game_data.get("gameID")
+        game_week = game_data.get("gameWeek")[6:]
         game_type = game_data.get("seasonType")
         game_status = game_data.get("gameStatus")
+        #  if (game_type == "Regular Season") and (game_status == "Completed"):
+            #  team_games.append((game_week, game_ID))
+
         if (game_type == "Regular Season") and (game_status == "Completed"):
             team_games.append(game_ID)
 
@@ -114,6 +158,7 @@ def storeTeamGames(teamAbv):
 
 
 if __name__ == '__main__':
+
 
     window = True
 
