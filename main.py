@@ -4,7 +4,7 @@ import streamlit as st
 from Player import Player_Info
 import pandas as pd
 import numpy as np
-import altair as alt
+from Charts import ChartGenerator
 
 def validPlayer(name):
     conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
@@ -168,41 +168,6 @@ def storeTeamGames(teamAbv):
 
     return team_games
 
-def get_chart(data):
-    hover = alt.selection_single(
-        fields=["Gameweek"],
-        nearest=True,
-        on="mouseover",
-        empty="none"
-    )
-
-    lines = (
-        alt.Chart(data, title="Points per game")
-        .mark_line()
-        .encode(
-            x="Gameweek",
-            y="Points"
-        )
-    )
-
-    points = lines.transform_filter(hover).mark_circle(size=65)
-
-    tooltips = (
-        alt.Chart(data)
-        .mark_rule()
-        .encode(
-            x="Gameweek",
-            y="Points",
-            opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
-            tooltip=[
-                alt.Tooltip("Gameweek", title="Gameweek"),
-                alt.Tooltip("Points", title="Points"),
-            ],
-        )
-        .add_selection(hover)
-    )
-    return (lines + points + tooltips).interactive()
-
 
 if __name__ == '__main__':
 
@@ -237,6 +202,4 @@ if __name__ == '__main__':
             }
         )
 
-        chart = get_chart(chart_data)
-
-        st.altair_chart(chart.interactive(), use_container_width=True)
+        ChartGenerator.altair_chart(chart_data)
