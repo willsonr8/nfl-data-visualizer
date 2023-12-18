@@ -3,7 +3,7 @@ import json
 import streamlit as st
 from Player import Player_Info
 import pandas as pd
-import numpy as np
+from Charts import ChartGenerator
 
 def validPlayer(name):
     conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
@@ -68,7 +68,6 @@ def getGameWeek(game_ID):
 
     return game_week
 
-
 def pullFantasyInfo(player):
     conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
 
@@ -93,13 +92,13 @@ def pullFantasyInfo(player):
 
     seen_games = set()
 
-    team_games = storeTeamGames(player.team)
+    completed_team_games, all_team_games = storeTeamGames(player.team)
 
     for key in parsed_data["body"].keys():
         game_ID = parsed_data["body"][key]["gameID"]
         player_games.append(game_ID)
 
-    for game in team_games:
+    for game in completed_team_games:
         if game in player_games:  # handles games where points accrued
             game_points = float(parsed_data["body"][game]["fantasyPointsDefault"]["PPR"])
             fantasy_points.append(game_points)
@@ -137,36 +136,43 @@ def storeTeamGames(teamAbv):
 
     print(parsed_data)
 
-    team_games = []
+    completed_team_games = []
+
+    all_team_games = []
 
     game_weeks = []
-
 
     for game_data in parsed_data["body"]["schedule"]:
         game_type = game_data.get("seasonType")
         game_status = game_data.get("gameStatus")
+        game_ID = game_data.get("gameID")
+        game_string = game_data.get('away') + ' @ ' + game_data.get('home')
 
-        if (game_type == "Regular Season"):
+        if game_type == "Regular Season":
             if game_status == "Completed":
-                game_ID = game_data.get("gameID")
-                team_games.append(game_ID)
+                completed_team_games.append(game_ID)
             else:
-                team_games.append(None)
+                completed_team_games.append(None)
+
             game_week = int(game_data.get("gameWeek")[5:])
             game_weeks.append(game_week)
+            all_team_games.append((game_week, game_string))
 
     for i in range(len(game_weeks) - 1):
         if game_weeks[i] == game_weeks[i + 1]:
-            del team_games[i + 2]
+            del completed_team_games[i + 2]
+            del all_team_games[i + 2]
             continue
         if (game_weeks[i] + 1) != (game_weeks[i + 1]):
-            team_games.insert(i + 1, None)
+            completed_team_games.insert(i + 1, None)
+            all_team_games.insert(i + 1, ("Bye", "Bye"))
 
-    for val in team_games:
+    for val in all_team_games:
+        print(str(val) + " ")
+    for val in completed_team_games:
         print(str(val) + " ")
 
-    return team_games
-
+    return completed_team_games, all_team_games
 
 
 if __name__ == '__main__':
@@ -193,13 +199,32 @@ if __name__ == '__main__':
 
         st.image(player.headshot)
 
-        team_games = storeTeamGames(player.team)
+        completed_team_games, all_team_games = storeTeamGames(player.team)
+
+        table_data = pd.DataFrame(
+            {
+                "Gameweek": [i for i, _ in all_team_games],
+                "Matchup": [j for _, j in all_team_games],
+                "Points": [k for k in player.fantasy_points]
+
+            }
+
+        )
+
+        st.dataframe(table_data, hide_index=True)
 
         chart_data = pd.DataFrame(
             {
-                "week": range(1, len(team_games) + 1),
-                "points": player.fantasy_points
+                "Gameweek": range(1, len(completed_team_games) + 1),
+                "Points": player.fantasy_points
             }
         )
 
-        st.line_chart(chart_data, x="week", y="points")
+        tab1, tab2 = st.tabs(["Fantasy Points Per Week", "Scatterplot"])
+
+        with tab1:
+            ChartGenerator.altair_chart(chart_data)
+
+        with tab2:
+            ChartGenerator.scatter_plot(chart_data)
+
