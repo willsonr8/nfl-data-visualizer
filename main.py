@@ -1,5 +1,6 @@
 import http.client
 import json
+import streamlit as st
 from Player import Player_Info
 import pandas as pd
 import numpy as np
@@ -103,8 +104,8 @@ def pullFantasyInfo(player):
             game_points = float(parsed_data["body"][game]["fantasyPointsDefault"]["PPR"])
             fantasy_points.append(game_points)
             seen_games.add(game)
-        elif game == np.NaN:  # handles bye weeks
-            fantasy_points.append(np.NaN)
+        elif game is None:  # handles bye weeks
+            fantasy_points.append(None)
         else:  # handles games where no points accrued
             fantasy_points.append(0.0)
 
@@ -146,8 +147,11 @@ def storeTeamGames(teamAbv):
         game_status = game_data.get("gameStatus")
 
         if (game_type == "Regular Season"):
-            game_ID = game_data.get("gameID")
-            team_games.append(game_ID)
+            if game_status == "Completed":
+                game_ID = game_data.get("gameID")
+                team_games.append(game_ID)
+            else:
+                team_games.append(None)
             game_week = int(game_data.get("gameWeek")[5:])
             game_weeks.append(game_week)
 
@@ -156,7 +160,7 @@ def storeTeamGames(teamAbv):
             del team_games[i + 2]
             continue
         if (game_weeks[i] + 1) != (game_weeks[i + 1]):
-            team_games.insert(i + 1, np.NaN)
+            team_games.insert(i + 1, None)
 
     for val in team_games:
         print(str(val) + " ")
@@ -167,38 +171,35 @@ def storeTeamGames(teamAbv):
 
 if __name__ == '__main__':
 
+    st.title("NFL Data Visualizer")
 
-    window = True
+    st.text_input("Player name", key="name")
 
-    while window:
+    name = inputHandler(st.session_state.name)
 
-        user_input = input("Enter a player: ")
-
-        name = inputHandler(user_input)
-
-        if validPlayer(name) is False:
-
-            print("Player does not exist")
-
+    if validPlayer(name) is False:
+        if name == "":
+            st.write()
         else:
+            st.write("Player not found")
 
-            player = pullPlayer(name)
+    else:
 
-            if isinstance(player, Player_Info):
+        player = pullPlayer(name)
 
-                pullFantasyInfo(player)
+        pullFantasyInfo(player)
 
-                print(player.name)
+        st.write(player.name)
 
-                chart_data = pd.DataFrame(
-                    {
-                        "week": range(1, len(player.fantasy_points) + 1),
-                        "points": player.fantasy_points
-                    }
-                )
+        st.image(player.headshot)
 
-                for val in player.fantasy_points:
-                    print(str(val) + " ")
-            else:
-                print("Error: Player info retrieval failed")
+        team_games = storeTeamGames(player.team)
 
+        chart_data = pd.DataFrame(
+            {
+                "week": range(1, len(team_games) + 1),
+                "points": player.fantasy_points
+            }
+        )
+
+        st.line_chart(chart_data, x="week", y="points")
