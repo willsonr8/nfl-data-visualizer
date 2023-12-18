@@ -202,4 +202,11 @@ if __name__ == '__main__':
             }
         )
 
-        ChartGenerator.altair_chart(chart_data)
+        tab1, tab2 = st.tabs(["Fantasy Points Per Week", "Scatterplot"])
+
+        with tab1:
+            ChartGenerator.altair_chart(chart_data)
+
+        with tab2:
+            ChartGenerator.scatter_plot(chart_data)
+

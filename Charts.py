@@ -40,11 +40,11 @@ class ChartGenerator:
         return (lines + points + tooltips).interactive()
     @classmethod
     def line_chart(cls, data):
-        return
+        return st.line_chart(data, x="Gameweek", y="Points")
 
     @classmethod
     def scatter_plot(cls, data):
-        return
+        return st.scatter_chart(data, x="Gameweek", y="Points")
 
     @classmethod
     def altair_chart(cls, data):
