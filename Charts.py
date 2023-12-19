@@ -4,7 +4,7 @@ import streamlit as st
 class ChartGenerator:
 
     @classmethod
-    def get_chart(self, data):
+    def get_chart(cls, data):
         hover = alt.selection_single(
             fields=["Gameweek"],
             nearest=True,

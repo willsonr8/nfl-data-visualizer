@@ -88,6 +88,8 @@ def pullFantasyInfo(player):
 
     parsed_data = json.loads(data)
 
+    print(parsed_data)
+
     player_games = []
 
     seen_games = set()
@@ -148,7 +150,7 @@ def storeTeamGames(teamAbv):
         game_ID = game_data.get("gameID")
         game_string = game_data.get('away') + ' @ ' + game_data.get('home')
 
-        if game_type == "Regular Season":
+        if game_type == "Regular Season" and game_data.get('away') != game_data.get('home'):
             if game_status == "Completed":
                 completed_team_games.append(game_ID)
             else:
@@ -158,11 +160,21 @@ def storeTeamGames(teamAbv):
             game_weeks.append(game_week)
             all_team_games.append((game_week, game_string))
 
+    indices_to_remove = []
+
     for i in range(len(game_weeks) - 1):
+
         if game_weeks[i] == game_weeks[i + 1]:
-            del completed_team_games[i + 2]
-            del all_team_games[i + 2]
-            continue
+            if i + 2 < len(completed_team_games):  # Check if index exists
+                indices_to_remove.append(i + 2)
+            else:
+                indices_to_remove.append(i + 1)
+
+    for index in sorted(indices_to_remove, reverse=True):
+        del completed_team_games[index]
+        del all_team_games[index]
+
+    for i in range(len(game_weeks) - 1):
         if (game_weeks[i] + 1) != (game_weeks[i + 1]):
             completed_team_games.insert(i + 1, None)
             all_team_games.insert(i + 1, ("Bye", "Bye"))
