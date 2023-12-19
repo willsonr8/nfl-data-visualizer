@@ -218,7 +218,6 @@ if __name__ == '__main__':
                 "Gameweek": [i for i, _ in all_team_games],
                 "Matchup": [j for _, j in all_team_games],
                 "Points": [k for k in player.fantasy_points]
-
             }
 
         )

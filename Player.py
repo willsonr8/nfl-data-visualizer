@@ -6,6 +6,9 @@ class Player_Info:
         self.headshot = headshot
         self.team = team
         self.fantasy_points = []
+        self.rush_yards = []
+        self.carries = []
+        self.rushTD = []
 
     @classmethod
     def from_api_response(cls, api_response):
