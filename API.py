@@ -4,19 +4,64 @@ import json
 
 
 class APICalls:
+    url = "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
+    headers = {
+        'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
+        'X-RapidAPI-Host': url
+    }
+
+    @classmethod
+    def make_request(cls, endpoint):
+        conn = http.client.HTTPSConnection(cls.url)
+        conn.request("GET", endpoint, headers=cls.headers)
+        response = conn.getresponse()
+        data = response.read().decode("utf-8")
+        parsed_data = json.loads(data)
+        return parsed_data
+
+    @classmethod
+    def get_single_player_stats(cls, player_id):  # Get NFL Games and Stats for Single Player
+
+        endpoint = f"/getNFLGamesForPlayer?playerID={player_id}&fantasyPoints=true&twoPointConversions=2&" \
+                   f"passYards=.04&passTD=4&passInterceptions=-2&pointsPerReception=1&carries=.2&rushYards=.1&" \
+                   f"rushTD=6&fumbles=-2&receivingYards=.1&receivingTD=6&targets=0&defTD=6"
+
+        return cls.make_request(endpoint)
+
+    @classmethod
+    def get_player_info(cls, player_name):  # Get Player Information
+
+        endpoint = f"/getNFLPlayerInfo?playerName={player_name}&getStats=true"
+
+        return cls.make_request(endpoint)
+
+    @classmethod
+    def get_weekly_schedule(cls, week):
+
+        endpoint = f"/getNFLGamesForWeek?week={week}&seasonType=reg&season=2023"
+
+        return cls.make_request(endpoint)
+
+    @classmethod
+    def get_team_schedule(cls, team_abv):
+
+        endpoint = f"/getNFLTeamSchedule?teamAbv={team_abv}&season=2023"
+
+        return cls.make_request(endpoint)
+
+    @classmethod
+    def get_game_info(cls, game_id):
+
+        endpoint = f"/getNFLGameInfo?gameID={game_id}"
+
+        return cls.make_request(endpoint)
+
 
     @classmethod
     def valid_player(cls, player_name):
-        conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
 
-        headers = {
-            'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
-            'X-RapidAPI-Host': "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
-        }
+        data = cls.get_player_info(player_name)
 
-        conn.request("GET", f"/getNFLPlayerInfo?playerName={player_name}&getStats=true", headers=headers)
-        res = conn.getresponse()
-        data = res.read().decode("utf-8")
         if "error" in data:
             return False
         else:
@@ -24,24 +69,10 @@ class APICalls:
 
     @classmethod
     def pull_fantasy_info(cls, player):  # uses Get NFL Games and Stats For a Single Player
-        conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
 
-        headers = {
-            'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
-            'X-RapidAPI-Host': "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
-        }
+        parsed_data = cls.get_single_player_stats(player.ID)
 
-        conn.request("GET",
-                     f"/getNFLGamesForPlayer?playerID={player.ID}&fantasyPoints=true&twoPointConversions=2&passYards=.04&"
-                     f"passTD=4&passInterceptions=-2&pointsPerReception=1&carries=.2&rushYards=.1&rushTD=6&fumbles=-2&"
-                     f"receivingYards=.1&receivingTD=6&targets=0&defTD=6",
-                     headers=headers)
-
-        res = conn.getresponse()
-        data = res.read().decode("utf-8")
         fantasy_points = []
-
-        parsed_data = json.loads(data)
 
         print(parsed_data)
 
@@ -80,57 +111,17 @@ class APICalls:
     def pull_player(cls, name):  # uses Get Player Information API endpoint
         if name == "":
             return
-        conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
 
-        headers = {
-            'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
-            'X-RapidAPI-Host': "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
-        }
+        parsed_data = cls.get_player_info(name)
 
-        conn.request("GET", f"/getNFLPlayerInfo?playerName={name}&getStats=true", headers=headers)
-
-        res = conn.getresponse()
-        data = res.read().decode("utf-8")  # Decode the response to a string
-
-        player = Player_Info.from_api_response(data)
+        player = Player_Info.from_api_response(parsed_data)
 
         return player
 
     @classmethod
-    def get_week_schedule(cls, week):
-        import http.client
-
-        conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
-
-        headers = {
-            'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
-            'X-RapidAPI-Host': "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
-        }
-
-        conn.request("GET", f"/getNFLGamesForWeek?week={week}&seasonType=reg&season=2023", headers=headers)
-
-        res = conn.getresponse()
-        data = res.read().decode("utf-8")
-
-        return data
-
-        # not fully implemented because not currently in use, imp depends on use case
-
-    @classmethod
     def store_team_games(cls, teamAbv):
 
-        conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
-
-        headers = {
-            'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
-            'X-RapidAPI-Host': "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
-        }
-
-        conn.request("GET", f"/getNFLTeamSchedule?teamAbv={teamAbv}&season=2023", headers=headers)
-
-        res = conn.getresponse()
-        data = res.read().decode("utf-8")
-        parsed_data = json.loads(data)
+        parsed_data = cls.get_team_schedule(teamAbv)
 
         print(parsed_data)
 
@@ -183,21 +174,9 @@ class APICalls:
         return completed_team_games, all_team_games
 
     @classmethod
-    def get_game_week(cls, game_ID):
-        import http.client
+    def get_game_week(cls, game_id):
 
-        conn = http.client.HTTPSConnection("tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com")
-
-        headers = {
-            'X-RapidAPI-Key': "00d7863507msh695c4dd7170a696p12d9efjsnfe4d06584f4b",
-            'X-RapidAPI-Host': "tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com"
-        }
-
-        conn.request("GET", f"/getNFLGameInfo?gameID={game_ID}", headers=headers)
-
-        res = conn.getresponse()
-        data = res.read().decode("utf-8")
-        parsed_data = json.loads(data)
+        parsed_data = cls.get_game_info(game_id)
 
         game_week = int(parsed_data["body"]["gameWeek"][5:])
 

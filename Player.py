@@ -11,9 +11,7 @@ class Player_Info:
         self.rushTD = []
 
     @classmethod
-    def from_api_response(cls, api_response):
-
-        parsed_data = json.loads(api_response)
+    def from_api_response(cls, parsed_data):
 
         player_info = parsed_data["body"][0]
         name = player_info.get("espnName")
