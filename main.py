@@ -43,7 +43,27 @@ if __name__ == '__main__':
             {
                 "Gameweek": [i for i, _ in all_team_games],
                 "Matchup": [j for _, j in all_team_games],
-                "Points": [k for k in player.fantasy_points]
+                "Points": player.fantasy_points,
+                "Rush Avg": player.rush_avg,
+                "Rush Yards": player.rush_yards,
+                "Carries": player.carries,
+                "Long Rush": player.long_rush,
+                "Rush TD": player.rush_td,
+                "Fumbles": player.fumbles,
+                "Fumbles Lost": player.fumbles_lost,
+                "Receptions": player.receptions,
+                "Rec TD": player.rec_td,
+                "Long Rec": player.long_rec,
+                "Targets": player.targets,
+                "Rec Yards": player.rec_yards,
+                "Rec Avg": player.rec_avg,
+                "Two Point Conversions": player.two_point_conversions,
+                "Pass Attempts": player.pass_attempts,
+                "Pass Avg": player.pass_avg,
+                "Pass TD": player.pass_td,
+                "Pass Yards": player.pass_yds,
+                "Interceptions": player.interceptions,
+                "Pass Completions": player.pass_completions
             }
 
         )
