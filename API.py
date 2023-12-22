@@ -67,7 +67,51 @@ class APICalls:
             return True
 
     @classmethod
-    def pull_fantasy_info(cls, player):  # uses Get NFL Games and Stats For a Single Player
+    def update_scoring_type(cls, player, scoring_type):
+        parsed_data = cls.get_single_player_stats(player.ID)
+
+        fantasy_points = []
+        player_games = []
+
+        seen_games = set()
+
+        completed_team_games, all_team_games = cls.store_team_games(player.team)
+
+        for key in parsed_data["body"].keys():
+            game_ID = parsed_data["body"][key]["gameID"]
+            player_games.append(game_ID)
+
+        for game in completed_team_games:
+            if game in player_games:  # handles games where points accrued
+
+                game_data = parsed_data["body"].get(game, {})
+
+                game_points = float(game_data.get("fantasyPointsDefault", {}).get(f"{scoring_type}", 0.0))
+
+                fantasy_points.append(game_points)
+
+                seen_games.add(game)
+
+            elif game is None:  # handles bye weeks
+                fantasy_points.append(None)
+
+            else:  # handles games where no points accrued
+                fantasy_points.append(0.0)
+
+        for game in player_games:
+            if game not in seen_games:
+
+                if int(game[0:8]) > 20230827:  # should be a way to clean this up
+                    game_week = cls.get_game_week(game)
+
+                    if game_week <= len(fantasy_points):
+                        fantasy_points[game_week - 1] = float(parsed_data["body"][game]["fantasyPointsDefault"][f"{scoring_type}"])
+
+                    # Assign lists to player attributes
+        player.fantasy_points = fantasy_points
+
+    @classmethod
+    def pull_fantasy_info(cls, player, scoring_type):  # uses Get NFL Games and Stats For a Single Player
 
         parsed_data = cls.get_single_player_stats(player.ID)
 
@@ -112,7 +156,7 @@ class APICalls:
 
                 game_data = parsed_data["body"].get(game, {})
 
-                game_points = float(game_data.get("fantasyPointsDefault", {}).get("PPR", 0.0))
+                game_points = float(game_data.get("fantasyPointsDefault", {}).get(f"{scoring_type}", 0.0))
                 game_rush_avg = float(game_data.get("Rushing", {}).get("rushAvg", 0.0))
                 game_rush_yards = float(game_data.get("Rushing", {}).get("rushYds", 0.0))
                 game_carries = float(game_data.get("Rushing", {}).get("carries", 0.0))
@@ -223,7 +267,7 @@ class APICalls:
                     game_week = cls.get_game_week(game)
 
                     if game_week <= len(fantasy_points):
-                        fantasy_points[game_week - 1] = float(parsed_data["body"][game]["fantasyPointsDefault"]["PPR"])
+                        fantasy_points[game_week - 1] = float(parsed_data["body"][game]["fantasyPointsDefault"][f"{scoring_type}"])
                         rush_avg[game_week - 1] = float(
                             parsed_data["body"][game].get("Rushing", {}).get("rushAvg", 0.0))
                         rush_yards[game_week - 1] = float(

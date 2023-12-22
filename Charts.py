@@ -4,7 +4,7 @@ import streamlit as st
 class ChartGenerator:
 
     @classmethod
-    def get_chart(cls, data):
+    def get_chart(cls, data, option):
         hover = alt.selection_single(
             fields=["Gameweek"],
             nearest=True,
@@ -13,11 +13,11 @@ class ChartGenerator:
         )
 
         lines = (
-            alt.Chart(data, title="Points per game")
+            alt.Chart(data, title=f"{option}s per game")
             .mark_line()
             .encode(
                 x="Gameweek",
-                y="Points"
+                y=f'{option}',
             )
         )
 
@@ -28,25 +28,26 @@ class ChartGenerator:
             .mark_rule()
             .encode(
                 x="Gameweek",
-                y="Points",
+                y=f'{option}',
                 opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
                 tooltip=[
                     alt.Tooltip("Gameweek", title="Gameweek"),
-                    alt.Tooltip("Points", title="Points"),
+                    alt.Tooltip(f'{option}', title=f'{option}'),
                 ],
             )
             .add_selection(hover)
         )
+
         return (lines + points + tooltips).interactive()
     @classmethod
     def line_chart(cls, data):
         return st.line_chart(data, x="Gameweek", y="Points")
 
     @classmethod
-    def scatter_plot(cls, data):
-        return st.scatter_chart(data, x="Gameweek", y="Points")
+    def scatter_plot(cls, data, option):
+        return st.scatter_chart(data, x="Gameweek", y=f"{option}")
 
     @classmethod
-    def altair_chart(cls, data):
-        chart = cls.get_chart(data)
+    def altair_chart(cls, data, option):
+        chart = cls.get_chart(data, option)
         return st.altair_chart(chart.interactive(), use_container_width=True)
