@@ -3,7 +3,6 @@ from Charts import ChartGenerator
 import streamlit as st
 import pandas as pd
 
-
 def input_handler(name):
     norm_input = ""
     for c in name:
@@ -199,16 +198,11 @@ if __name__ == '__main__':
 
                 completed_team_games2, all_team_games2 = APICalls.store_team_games(player2.team)
 
-                chart_data2 = pd.DataFrame(
-                    {
-                        "Gameweek": range(1, len(completed_team_games2) + 1),
-                        "Points": player.fantasy_points,
-                        "Points2": player2.fantasy_points
-                    }
-                )
-                if chart_data2 is not None:
+                data = pd.DataFrame({
+                    'Gameweek': range(1, len(completed_team_games) + 1),
+                    'Player1': player.fantasy_points,
+                    'Player2': player2.fantasy_points,
+                })
 
-                    ChartGenerator.altair_chart(chart_data2, option)
-                else:
-                    st.write("Whoops")
+                ChartGenerator.compare_altair_chart(data)
 
