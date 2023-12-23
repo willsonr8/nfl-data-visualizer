@@ -194,15 +194,13 @@ if __name__ == '__main__':
 
                 APICalls.pull_fantasy_info(player2, scoring_type)
 
-                st.write(player2.name)
-
                 completed_team_games2, all_team_games2 = APICalls.store_team_games(player2.team)
 
                 data = pd.DataFrame({
                     'Gameweek': range(1, len(completed_team_games) + 1),
-                    'Player1': player.fantasy_points,
-                    'Player2': player2.fantasy_points,
+                    f'{player.name}': player.fantasy_points,
+                    f'{player2.name}': player2.fantasy_points,
                 })
 
-                ChartGenerator.compare_altair_chart(data)
+                ChartGenerator.compare_altair_chart(data, player.name, player2.name)
 

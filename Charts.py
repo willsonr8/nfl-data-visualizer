@@ -54,7 +54,7 @@ class ChartGenerator:
         return st.altair_chart(chart.interactive(), use_container_width=True)
 
     @classmethod
-    def get_compare_chart(cls, data):
+    def get_compare_chart(cls, data, name1, name2):
         hover = alt.selection_single(
             fields=["Gameweek"],
             nearest=True,
@@ -65,13 +65,14 @@ class ChartGenerator:
         lines = (
             alt.Chart(data)
             .transform_fold(
-                ["Player1", "Player2"],
+                [f'{name1}', f'{name2}'],
+                as_=['Player', 'Points']
             )
             .mark_line()
             .encode(
                 x='Gameweek',
-                y='value:Q',
-                color='key:N'
+                y='Points:Q',
+                color='Player:N'
             )
             .properties(title="Points per game")
         )
@@ -83,19 +84,19 @@ class ChartGenerator:
             .mark_rule()
             .encode(
                 x="Gameweek",
-                y='value:Q',
+                y='Points:Q',
                 opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
                 tooltip=[
                     alt.Tooltip("Gameweek", title="Gameweek"),
-                    alt.Tooltip('value:Q', title="Points")
+                    alt.Tooltip('Points:Q', title="Points")
                 ],
             )
             .add_selection(hover)
         )
-        print(data.dtypes)
+
         return (lines + points + tooltips).interactive()
 
     @classmethod
-    def compare_altair_chart(cls, data):
-        chart = cls.get_compare_chart(data)
+    def compare_altair_chart(cls, data, name1, name2):
+        chart = cls.get_compare_chart(data, name1, name2)
         return st.altair_chart(chart.interactive(), use_container_width=True)
