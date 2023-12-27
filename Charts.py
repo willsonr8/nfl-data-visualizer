@@ -14,7 +14,7 @@ class ChartGenerator:
         )
 
         lines = (
-            alt.Chart(data, title=f"{option}s per game")
+            alt.Chart(data, title=f"{option} per game")
             .mark_line()
             .encode(
                 x="Gameweek",
