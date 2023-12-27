@@ -1,5 +1,6 @@
 from API import APICalls
 from Charts import ChartGenerator
+from NFLteam import Team
 import streamlit as st
 import pandas as pd
 from PIL import Image
@@ -58,6 +59,15 @@ def random_pixel(image_url):
 
 if __name__ == '__main__':
 
+    team_dict = {}
+
+    team_data = APICalls.get_nfl_teams()
+
+    for team in team_data["body"]:
+        team_abv = team.get("teamAbv")
+        team_instance = Team.from_api_response(team)
+        team_dict[team_abv] = team_instance
+
     st.title("NFL Data Visualizer")
 
     col1, col2 = st.columns([4, 1])
@@ -86,7 +96,7 @@ if __name__ == '__main__':
         player = APICalls.pull_player(name)
         APICalls.pull_fantasy_info(player, scoring_type)
 
-        col1, col2 = st.columns([2, 3])
+        col1, col2, col3 = st.columns([3, 4, 2])
 
         with col1:
             hex_code = random_pixel(player.headshot)
@@ -104,21 +114,19 @@ if __name__ == '__main__':
             st.markdown(
                 """
                 <style>
-                /* Increase font size for all headers in column 2 */
                 div[data-testid="stHorizontalBlock"] > div:last-child {
-                    font-size: 24px; /* Adjust the font size as needed */
+                    font-size: 24px;
                 }
-                /* Shift text up by reducing bottom padding */
+        
                 div[data-testid="stHorizontalBlock"] > div:last-child > div > div {
-                    padding-bottom: 5px; /* Adjust the padding as needed */
+                    padding-bottom: 0px; 
                 }
                 </style>
                 """,
                 unsafe_allow_html=True,
             )
-            st.header(player.name)
-            st.subheader(f'#{player.num}')
-            st.subheader(player.team)
+            st.header(f'{player.name} #{player.num}')
+            st.header(f'{team_dict[player.team].teamCity} {team_dict[player.team].teamName}')
 
         # Applying some formatting options
         st.markdown("<hr>", unsafe_allow_html=True)  # Adding a horizontal rule for separation
@@ -134,6 +142,9 @@ if __name__ == '__main__':
             """,
             unsafe_allow_html=True,
         )
+
+        with col3:
+            st.image(team_dict[player.team].espnLogo1)
 
         completed_team_games, all_team_games = APICalls.store_team_games(player.team)
 

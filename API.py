@@ -20,6 +20,12 @@ class APICalls:
         return parsed_data
 
     @classmethod
+    def get_nfl_teams(cls):
+        endpoint = "/getNFLTeams?rosters=false&schedules=true&topPerformers=false&teamStats=true"
+
+        return cls.make_request(endpoint)
+
+    @classmethod
     def get_single_player_stats(cls, player_id):  # Get NFL Games and Stats for Single Player
 
         endpoint = f"/getNFLGamesForPlayer?playerID={player_id}&fantasyPoints=true&twoPointConversions=2&" \

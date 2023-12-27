@@ -1,0 +1,570 @@
+Contents
+1. Get NFL Games and Stats for a Single Player // stores all stats of games played, includes standard, PPR and half PPR calculations 
+2. Get Player Information // most useful is headshot, espnID, team abbrev, possibly number 
+3. Get Weekly NFL Schedule // can sort by week and filter by reg or pre season 
+// one use case could be to verify reg season game by filtering by week and year and then searching for gameID rather than comparing to big number 
+4. Get NFL Team Schedule // seasonType comparison can differentiate between pre and reg season. gameStatus can differentiate between Completed and not played 
+// also hosts game date, could be good for news correlation 
+5. Get General Game Info 
+// allows search for game by gameID, access to teams, date, seasonType, gameStatus 
+
+
+
+
+1. Get NFL Games and Stats for a Single Player // stores all stats of games played, includes standard, PPR and half PPR calculations 
+{
+  "statusCode": 200,
+  "body": {
+    "20231022_WSH@NYG": {
+      "teamAbv": "WSH",
+      "Receiving": {
+        "receptions": "6",
+        "recTD": "0",
+        "longRec": "31",
+        "targets": "9",
+        "recYds": "90",
+        "recAvg": "15.0"
+      },
+      "longName": "Terry McLaurin",
+      "playerID": "3121422",
+      "team": "WSH",
+      "teamID": "32",
+      "gameID": "20231022_WSH@NYG",
+      "fantasyPoints": "15.0",
+      "fantasyPointsDefault": {
+        "standard": "9.0",
+        "PPR": "15.0",
+        "halfPPR": "12.0"
+      }
+    },
+    "20231001_WSH@PHI": {
+      "Defense": {
+        "fumblesLost": "0",
+        "defensiveInterceptions": "0",
+        "defTD": "1",
+        "fumbles": "0",
+        "fumblesRecovered": "1"
+      },
+      "teamAbv": "WSH",
+      "Receiving": {
+        "receptions": "8",
+        "recTD": "0",
+        "longRec": "24",
+        "targets": "10",
+        "recYds": "86",
+        "recAvg": "10.8"
+      },
+      "longName": "Terry McLaurin",
+      "scoringPlays": [
+        {
+          "score": "Terry McLaurin 0 Yd Fumble Recovery (Joey Slye Kick)",
+          "scorePeriod": "Q2",
+          "homeScore": "7",
+          "awayScore": "14",
+          "teamID": "32",
+          "scoreDetails": "7 plays, 75 yards, 3:21",
+          "scoreType": "TD",
+          "scoreTime": "12:56",
+          "team": "WSH",
+          "playerIDs": [
+            "3121422",
+            "3124084"
+          ]
+        }
+      ],
+      "playerID": "3121422",
+      "team": "WSH",
+      "teamID": "32",
+      "gameID": "20231001_WSH@PHI",
+      "fantasyPoints": "22.6",
+      "fantasyPointsDefault": {
+        "standard": "14.6",
+        "PPR": "22.6",
+        "halfPPR": "18.6"
+      }
+    },
+  }
+}
+
+2. Get Player Information // most useful is headshot, espnID, team abbrev, possibly number 
+{
+  "statusCode": 200,
+  "body": [
+    {
+      "espnID": "4362887",
+      "espnName": "Justin Fields",
+      "sleeperBotID": "7591",
+      "fantasyProsPlayerID": "19781",
+      "espnIDFull": "4362887/justin-fields",
+      "weight": "228",
+      "jerseyNum": "1",
+      "cbsShortName": "J. Fields",
+      "team": "CHI",
+      "yahooPlayerID": "33399",
+      "age": "24",
+      "espnLink": "http://www.espn.com/nfl/player/_/id/4362887/justin-fields",
+      "yahooLink": "https://sports.yahoo.com/nfl/players/33399",
+      "bDay": "3/5/1999",
+      "espnHeadshot": "https://a.espncdn.com/i/headshots/nfl/players/full/4362887.png",
+      "isFreeAgent": "False",
+      "rotoWirePlayerIDFull": "justin-fields-15416",
+      "cbsLongName": "Justin Fields",
+      "injury": {
+        "description": "",
+        "injDate": "",
+        "designation": ""
+      },
+      "teamID": "6",
+      "pos": "QB",
+      "school": "Ohio State",
+      "cbsPlayerID": "1273205",
+      "longName": "Justin Fields",
+      "rotoWirePlayerID": "15416",
+      "height": "6'3\"",
+      "cbsPlayerIDFull": "1273205/justin-fields",
+      "lastGamePlayed": "20231217_CHI@CLE",
+      "playerID": "4362887",
+      "exp": "3",
+      "fantasyProsLink": "https://www.fantasypros.com/nfl/players/justin-fields.php",
+      "stats": {
+        "Rushing": {
+          "rushYds": "488.0",
+          "carries": "96.0",
+          "rushTD": "2.0"
+        },
+        "Passing": {
+          "passAttempts": "295.0",
+          "passTD": "14.0",
+          "passYds": "1976.0",
+          "int": "8.0",
+          "passCompletions": "181.0"
+        },
+        "Receiving": {
+          "receptions": "0.0",
+          "recTD": "0.0",
+          "targets": "0.0",
+          "recYds": "0.0"
+        },
+        "gamesPlayed": "10",
+        "teamID": "6",
+        "team": "CHI",
+        "teamAbv": "CHI",
+        "Defense": {
+          "totalTackles": "0.0",
+          "defTD": "0.0",
+          "soloTackles": "0.0",
+          "defensiveInterceptions": "0.0",
+          "qbHits": "0.0",
+          "tfl": "0.0",
+          "passDeflections": "0.0",
+          "sacks": "0.0"
+        }
+      }
+    }
+  ]
+}
+
+3. Get Weekly NFL Schedule // can sort by week and filter by reg or pre season 
+// one use case could be to verify reg season game by filtering by week and year and then searching for gameID rather than comparing to big number 
+{
+  "statusCode": 200,
+  "body": [
+    {
+      "gameID": "20230907_DET@KC",
+      "seasonType": "Regular Season",
+      "away": "DET",
+      "gameDate": "20230907",
+      "espnID": "401547353",
+      "teamIDHome": "16",
+      "gameStatus": "Final",
+      "gameWeek": "Week 1",
+      "teamIDAway": "11",
+      "home": "KC",
+      "espnLink": "https://www.espn.com/nfl/boxscore/_/gameId/401547353",
+      "cbsLink": "https://www.cbssports.com/nfl/gametracker/boxscore/NFL_20230907_DET@KC",
+      "gameTime": "8:20p",
+      "gameTime_epoch": "1694132400.0",
+      "season": "2023",
+      "neutralSite": "False"
+    },
+    {
+      "gameID": "20230910_ARI@WSH",
+      "seasonType": "Regular Season",
+      "away": "ARI",
+      "gameDate": "20230910",
+      "espnID": "401547406",
+      "teamIDHome": "32",
+      "gameStatus": "Final",
+      "gameWeek": "Week 1",
+      "teamIDAway": "1",
+      "home": "WSH",
+      "espnLink": "https://www.espn.com/nfl/boxscore/_/gameId/401547406",
+      "cbsLink": "https://www.cbssports.com/nfl/gametracker/boxscore/NFL_20230910_ARI@WAS",
+      "gameTime": "1:00p",
+      "gameTime_epoch": "1694365200.0",
+      "season": "2023",
+      "neutralSite": "False"
+    },
+    
+4. Get NFL Team Schedule // seasonType comparison can differentiate between pre and reg season. gameStatus can differentiate between Completed and not played 
+// also hosts game date, could be good for news correlation 
+{
+  "statusCode": 200,
+  "body": {
+    "team": "CHI",
+    "schedule": [
+      {
+        "gameID": "20230812_TEN@CHI",
+        "seasonType": "Preseason",
+        "away": "TEN",
+        "teamIDHome": "6",
+        "gameDate": "20230812",
+        "gameStatus": "Completed",
+        "gameWeek": "Preseason Week 1",
+        "teamIDAway": "31",
+        "home": "CHI",
+        "awayResult": "L",
+        "homePts": "23",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1691859600.0",
+        "homeResult": "W",
+        "awayPts": "17"
+      },
+      {
+        "gameID": "20230819_CHI@IND",
+        "seasonType": "Preseason",
+        "away": "CHI",
+        "teamIDHome": "14",
+        "gameDate": "20230819",
+        "gameStatus": "Completed",
+        "gameWeek": "Preseason Week 2",
+        "teamIDAway": "6",
+        "home": "IND",
+        "awayResult": "L",
+        "homePts": "24",
+        "gameTime": "7:00p",
+        "gameTime_epoch": "1692486000.0",
+        "homeResult": "W",
+        "awayPts": "17"
+      },
+      {
+        "gameID": "20230826_BUF@CHI",
+        "seasonType": "Preseason",
+        "away": "BUF",
+        "teamIDHome": "6",
+        "gameDate": "20230826",
+        "gameStatus": "Completed",
+        "gameWeek": "Preseason Week 3",
+        "teamIDAway": "4",
+        "home": "CHI",
+        "awayResult": "W",
+        "homePts": "21",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1693069200.0",
+        "homeResult": "L",
+        "awayPts": "24"
+      },
+      {
+        "gameID": "20230910_GB@CHI",
+        "seasonType": "Regular Season",
+        "away": "GB",
+        "teamIDHome": "6",
+        "gameDate": "20230910",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 1",
+        "teamIDAway": "12",
+        "home": "CHI",
+        "awayResult": "W",
+        "homePts": "20",
+        "gameTime": "4:25p",
+        "gameTime_epoch": "1694377500.0",
+        "homeResult": "L",
+        "awayPts": "38"
+      },
+      {
+        "gameID": "20230917_CHI@TB",
+        "seasonType": "Regular Season",
+        "away": "CHI",
+        "teamIDHome": "30",
+        "gameDate": "20230917",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 2",
+        "teamIDAway": "6",
+        "home": "TB",
+        "awayResult": "L",
+        "homePts": "27",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1694970000.0",
+        "homeResult": "W",
+        "awayPts": "17"
+      },
+      {
+        "gameID": "20230924_CHI@KC",
+        "seasonType": "Regular Season",
+        "away": "CHI",
+        "teamIDHome": "16",
+        "gameDate": "20230924",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 3",
+        "teamIDAway": "6",
+        "home": "KC",
+        "awayResult": "L",
+        "homePts": "41",
+        "gameTime": "4:25p",
+        "gameTime_epoch": "1695587100.0",
+        "homeResult": "W",
+        "awayPts": "10"
+      },
+      {
+        "gameID": "20231001_DEN@CHI",
+        "seasonType": "Regular Season",
+        "away": "DEN",
+        "teamIDHome": "6",
+        "gameDate": "20231001",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 4",
+        "teamIDAway": "10",
+        "home": "CHI",
+        "awayResult": "W",
+        "homePts": "28",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1696179600.0",
+        "homeResult": "L",
+        "awayPts": "31"
+      },
+      {
+        "gameID": "20231005_CHI@WSH",
+        "seasonType": "Regular Season",
+        "away": "CHI",
+        "teamIDHome": "32",
+        "gameDate": "20231005",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 5",
+        "teamIDAway": "6",
+        "home": "WSH",
+        "awayResult": "W",
+        "homePts": "20",
+        "gameTime": "8:15p",
+        "gameTime_epoch": "1696551300.0",
+        "homeResult": "L",
+        "awayPts": "40"
+      },
+      {
+        "gameID": "20231015_MIN@CHI",
+        "seasonType": "Regular Season",
+        "away": "MIN",
+        "teamIDHome": "6",
+        "gameDate": "20231015",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 6",
+        "teamIDAway": "21",
+        "home": "CHI",
+        "awayResult": "W",
+        "homePts": "13",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1697389200.0",
+        "homeResult": "L",
+        "awayPts": "19"
+      },
+      {
+        "gameID": "20231022_LV@CHI",
+        "seasonType": "Regular Season",
+        "away": "LV",
+        "teamIDHome": "6",
+        "gameDate": "20231022",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 7",
+        "teamIDAway": "17",
+        "home": "CHI",
+        "awayResult": "L",
+        "homePts": "30",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1697994000.0",
+        "homeResult": "W",
+        "awayPts": "12"
+      },
+      {
+        "gameID": "20231029_CHI@LAC",
+        "seasonType": "Regular Season",
+        "away": "CHI",
+        "teamIDHome": "18",
+        "gameDate": "20231029",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 8",
+        "teamIDAway": "6",
+        "home": "LAC",
+        "awayResult": "L",
+        "homePts": "30",
+        "gameTime": "8:20p",
+        "gameTime_epoch": "1698625200.0",
+        "homeResult": "W",
+        "awayPts": "13"
+      },
+      {
+        "gameID": "20231105_CHI@NO",
+        "seasonType": "Regular Season",
+        "away": "CHI",
+        "teamIDHome": "23",
+        "gameDate": "20231105",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 9",
+        "teamIDAway": "6",
+        "home": "NO",
+        "awayResult": "L",
+        "homePts": "24",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1699207200.0",
+        "homeResult": "W",
+        "awayPts": "17"
+      },
+      {
+        "gameID": "20231109_CAR@CHI",
+        "seasonType": "Regular Season",
+        "away": "CAR",
+        "teamIDHome": "6",
+        "gameDate": "20231109",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 10",
+        "teamIDAway": "5",
+        "home": "CHI",
+        "awayResult": "L",
+        "homePts": "16",
+        "gameTime": "8:15p",
+        "gameTime_epoch": "1699578900.0",
+        "homeResult": "W",
+        "awayPts": "13"
+      },
+      {
+        "gameID": "20231119_CHI@DET",
+        "seasonType": "Regular Season",
+        "away": "CHI",
+        "teamIDHome": "11",
+        "gameDate": "20231119",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 11",
+        "teamIDAway": "6",
+        "home": "DET",
+        "awayResult": "L",
+        "homePts": "31",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1700416800.0",
+        "homeResult": "W",
+        "awayPts": "26"
+      },
+      {
+        "gameID": "20231127_CHI@MIN",
+        "seasonType": "Regular Season",
+        "away": "CHI",
+        "teamIDHome": "21",
+        "gameDate": "20231127",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 12",
+        "teamIDAway": "6",
+        "home": "MIN",
+        "awayResult": "W",
+        "homePts": "10",
+        "gameTime": "8:15p",
+        "gameTime_epoch": "1701134100.0",
+        "homeResult": "L",
+        "awayPts": "12"
+      },
+      {
+        "gameID": "20231210_DET@CHI",
+        "seasonType": "Regular Season",
+        "away": "DET",
+        "teamIDHome": "6",
+        "gameDate": "20231210",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 14",
+        "teamIDAway": "11",
+        "home": "CHI",
+        "awayResult": "L",
+        "homePts": "28",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1702231200.0",
+        "homeResult": "W",
+        "awayPts": "13"
+      },
+      {
+        "gameID": "20231217_CHI@CLE",
+        "seasonType": "Regular Season",
+        "away": "CHI",
+        "teamIDHome": "8",
+        "gameDate": "20231217",
+        "gameStatus": "Completed",
+        "gameWeek": "Week 15",
+        "teamIDAway": "6",
+        "home": "CLE",
+        "awayResult": "L",
+        "homePts": "20",
+        "gameTime": "1:00p",
+        "gameTime_epoch": "1702836000.0",
+        "homeResult": "W",
+        "awayPts": "17"
+      },
+      {
+        "gameID": "20231224_ARI@CHI",
+        "seasonType": "Regular Season",
+        "away": "ARI",
+        "gameTime": "4:25p",
+        "teamIDHome": "6",
+        "gameDate": "20231224",
+        "gameStatus": "Scheduled",
+        "gameTime_epoch": "1703453100.0",
+        "gameWeek": "Week 16",
+        "teamIDAway": "1",
+        "home": "CHI"
+      },
+      {
+        "gameID": "20231231_ATL@CHI",
+        "seasonType": "Regular Season",
+        "away": "ATL",
+        "gameTime": "1:00p",
+        "teamIDHome": "6",
+        "gameDate": "20231231",
+        "gameStatus": "Scheduled",
+        "gameTime_epoch": "1704045600.0",
+        "gameWeek": "Week 17",
+        "teamIDAway": "2",
+        "home": "CHI"
+      },
+      {
+        "gameID": "20240107_CHI@GB",
+        "seasonType": "Regular Season",
+        "away": "CHI",
+        "gameTime": "TBD",
+        "teamIDHome": "12",
+        "gameDate": "20240107",
+        "gameStatus": "Scheduled",
+        "gameTime_epoch": "",
+        "gameWeek": "Week 18",
+        "teamIDAway": "6",
+        "home": "GB"
+      }
+    ]
+  }
+}
+
+5. Get General Game Info 
+// allows search for game by gameID, access to teams, date, seasonType, gameStatus 
+
+{
+  "statusCode": 200,
+  "body": {
+    "espnID": "401437900",
+    "gameStatus": "Final",
+    "season": "2022",
+    "gameDate": "20221212",
+    "neutralSite": "False",
+    "teamIDHome": "1",
+    "cbsLink": "https://www.cbssports.com/nfl/gametracker/boxscore/NFL_20221212_NE@ARI",
+    "gameTime": "8:15p",
+    "teamIDAway": "22",
+    "away": "NE",
+    "gameWeek": "Week 14",
+    "gameID": "20221212_NE@ARI",
+    "seasonType": "Regular Season",
+    "espnLink": "https://www.espn.com/nfl/boxscore/_/gameId/401437900",
+    "home": "ARI"
+  }
+}
