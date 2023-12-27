@@ -39,7 +39,7 @@ class ChartGenerator:
             .add_selection(hover)
         )
 
-        return (lines + points + tooltips).interactive()
+        return lines + points + tooltips
     @classmethod
     def line_chart(cls, data):
         return st.line_chart(data, x="Gameweek", y="Points")
@@ -51,7 +51,7 @@ class ChartGenerator:
     @classmethod
     def altair_chart(cls, data, option):
         chart = cls.get_chart(data, option)
-        return st.altair_chart(chart.interactive(), use_container_width=True)
+        return st.altair_chart(chart, use_container_width=True)
 
     @classmethod
     def get_compare_chart(cls, data, name1, name2):
@@ -94,9 +94,9 @@ class ChartGenerator:
             .add_selection(hover)
         )
 
-        return (lines + points + tooltips).interactive()
+        return lines + points + tooltips
 
     @classmethod
     def compare_altair_chart(cls, data, name1, name2):
         chart = cls.get_compare_chart(data, name1, name2)
-        return st.altair_chart(chart.interactive(), use_container_width=True)
+        return st.altair_chart(chart, use_container_width=True)
