@@ -96,55 +96,40 @@ if __name__ == '__main__':
         player = APICalls.pull_player(name)
         APICalls.pull_fantasy_info(player, scoring_type)
 
-        col1, col2, col3 = st.columns([3, 4, 2])
+        col1, col2, col3 = st.columns([2, 3, 1])
 
         with col1:
             hex_code = random_pixel(player.headshot)
 
             st.markdown(
                 f"""
-                    <div style="background-color: {hex_code}; padding: 0px; border-radius: 10px; display: inline-block;">
-                    <img src="{player.headshot}" style="width: 100%; border-radius: 5px; object-fit: cover; height: 200px;">
+                    <div style="background-color: {hex_code}; padding: -500px; border-radius: 0px; display: inline-block;">
+                    <img src="{player.headshot}" style="width: 100%; border-radius: 0px; object-fit: cover; height: 200px;">
                     </div>
                     """,
                 unsafe_allow_html=True
             )
 
         with col2:
-            st.markdown(
-                """
-                <style>
-                div[data-testid="stHorizontalBlock"] > div:last-child {
-                    font-size: 24px;
-                }
-        
-                div[data-testid="stHorizontalBlock"] > div:last-child > div > div {
-                    padding-bottom: 0px; 
-                }
-                </style>
-                """,
-                unsafe_allow_html=True,
-            )
-            st.header(f'{player.name} #{player.num}')
-            st.header(f'{team_dict[player.team].teamCity} {team_dict[player.team].teamName}')
 
+            st.markdown(
+                f"""
+                <h1 style='margin-top: -30px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;'>
+                    <span style='font-size: 36px;'>
+                        {player.name} #{player.num}
+                    </span>
+                </h1>
+                <h4 style='margin-top: -30px; margin-bottom: 0px;'>{team_dict[player.team].teamCity} {team_dict[player.team].teamName}</h2>
+                <h4 style='margin-top: -30px; margin-bottom: 0px;'>{player.pos}</h2>
+                <h4 style='margin-top: -30px; margin-bottom: 0px;'>{player.age} years old</h2>
+                """,
+                unsafe_allow_html=True
+            )
         # Applying some formatting options
         st.markdown("<hr>", unsafe_allow_html=True)  # Adding a horizontal rule for separation
 
-        # Styling the columns
-        col2.markdown(
-            """
-            <style>
-            div[data-testid="stHorizontalBlock"] > div:last-child {
-                padding-left: 15px;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
-
         with col3:
-            st.image(team_dict[player.team].espnLogo1)
+            st.image(team_dict[player.team].espnLogo1, width=80)
 
         completed_team_games, all_team_games = APICalls.store_team_games(player.team)
 
@@ -232,6 +217,8 @@ if __name__ == '__main__':
             )
 
         st.dataframe(table_data, hide_index=True)
+
+        st.markdown("<hr>", unsafe_allow_html=True)  # Adding a horizontal rule for separation
 
         player_stats_dict = {
             "Points": player.fantasy_points,

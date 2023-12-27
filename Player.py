@@ -1,12 +1,13 @@
 import json
 class Player_Info:
-    def __init__(self, name, ID, pos, headshot, team, num):
+    def __init__(self, name, ID, pos, headshot, team, num, age):
         self.name = name
         self.ID = str(ID)
         self.pos = pos
         self.headshot = headshot
         self.team = team
         self.num = num
+        self.age = age
         self.fantasy_points = []
         # "Rushing"
         self.rush_avg = []
@@ -43,5 +44,6 @@ class Player_Info:
         headshot = player_info.get("espnHeadshot")
         team = player_info.get("team")
         num = player_info.get("jerseyNum")
+        age = player_info.get("age")
 
-        return cls(name, ID, pos, headshot, team, num)
+        return cls(name, ID, pos, headshot, team, num, age)
