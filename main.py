@@ -218,7 +218,7 @@ if __name__ == '__main__':
 
         #generate table
 
-        st.dataframe(table_data)
+        st.dataframe(table_data, hide_index=True)
 
         st.markdown("<hr>", unsafe_allow_html=True)  # Adding a horizontal rule for separation
 
