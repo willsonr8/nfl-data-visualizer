@@ -20,6 +20,12 @@ class APICalls:
         return parsed_data
 
     @classmethod
+    def get_player_news(cls, player_id):
+        endpoint = f"/getNFLNews?playerID={player_id}&topNews=true&fantasyNews=true&recentNews=true&maxItems=10"
+
+        return cls.make_request(endpoint)
+
+    @classmethod
     def get_nfl_teams(cls):
         endpoint = "/getNFLTeams?rosters=false&schedules=true&topPerformers=false&teamStats=true"
 
@@ -347,8 +353,6 @@ class APICalls:
 
         parsed_data = cls.get_team_schedule(teamAbv)
 
-        print(parsed_data)
-
         completed_team_games = []
 
         all_team_games = []
@@ -383,18 +387,10 @@ class APICalls:
             del all_team_games[index]
             del game_weeks[index]
 
-        for val in game_weeks:
-            print(str(val))
-
         for i in range(len(game_weeks) - 1):
             if (game_weeks[i] + 1) != (game_weeks[i + 1]):
                 completed_team_games.insert(i + 1, None)
                 all_team_games.insert(i + 1, (i + 2, "Bye"))
-
-        for val in all_team_games:
-            print(str(val) + " ")
-        for val in completed_team_games:
-            print(str(val) + " ")
 
         return completed_team_games, all_team_games
 
@@ -406,3 +402,22 @@ class APICalls:
         game_week = int(parsed_data["body"]["gameWeek"][5:])
 
         return game_week
+
+    @classmethod
+    def player_news_stack(cls, player):
+        parsed_data = cls.get_player_news(player.ID)
+        news_dict = []
+        for news in parsed_data["body"]:
+            real_title = news.get("title")
+            title = real_title.lower()
+            link = news.get("link")
+            week_number = None
+            if 'week ' in title:
+                week_substr = title.split('week ')[1].split()[0]
+                if week_substr.isdigit():
+                    week_number = int(week_substr)
+            if week_number and 1 <= week_number <= 18:
+                news_dict.append((week_number, player.fantasy_points[week_number - 1], real_title, link))
+        return news_dict
+
+

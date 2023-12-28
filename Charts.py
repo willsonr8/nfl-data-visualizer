@@ -5,7 +5,7 @@ import streamlit as st
 class ChartGenerator:
 
     @classmethod
-    def get_chart(cls, data, option):
+    def get_chart(cls, data, option, clickable_df):
         hover = alt.selection_single(
             fields=["Gameweek"],
             nearest=True,
@@ -38,8 +38,19 @@ class ChartGenerator:
             )
             .add_selection(hover)
         )
+        clickable_points = (
+            alt.Chart(clickable_df)  # Use your specific data for this layer
+            .mark_point()
+            .encode(
+                x='Gameweek',  # X-axis field
+                y='Points',  # Y-axis field
+                href='link:N',  # Field for hyperlink
+                tooltip=['title:N', 'link:N'],  # Tooltip information
+            )
+        )
 
-        return lines + points + tooltips
+        return lines + points + tooltips + clickable_points
+
     @classmethod
     def line_chart(cls, data):
         return st.line_chart(data, x="Gameweek", y="Points")
@@ -49,8 +60,8 @@ class ChartGenerator:
         return st.scatter_chart(data, x="Gameweek", y=f"{option}")
 
     @classmethod
-    def altair_chart(cls, data, option):
-        chart = cls.get_chart(data, option)
+    def altair_chart(cls, data, option, links):
+        chart = cls.get_chart(data, option, links)
         return st.altair_chart(chart, use_container_width=True)
 
     @classmethod

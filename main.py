@@ -253,14 +253,17 @@ if __name__ == '__main__':
         chart_data = pd.DataFrame(
             {
                 "Gameweek": range(1, len(completed_team_games) + 1),
-                f"{option}": player_stats_dict[option]
+                f"{option}": player_stats_dict[option],
             }
         )
+
+        news_list = APICalls.player_news_stack(player)
+        clickable_df = pd.DataFrame(news_list, columns=["Gameweek", "Points", "title", "link"])
 
         tab1, tab2, tab3 = st.tabs([f"{option} Per Week", "Scatterplot", "Player Comparison"])
 
         with tab1:
-            ChartGenerator.altair_chart(chart_data, option)
+            ChartGenerator.altair_chart(chart_data, option, clickable_df)
 
         with tab2:
             ChartGenerator.scatter_plot(chart_data, option)
