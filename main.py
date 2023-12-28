@@ -8,7 +8,7 @@ import requests
 from io import BytesIO
 
 
-def input_handler(name):
+def input_handler(name):  # converts spaces to underscores
     norm_input = ""
     for c in name:
         if c == " ":
@@ -17,22 +17,20 @@ def input_handler(name):
     return norm_input
 
 
-def mod_color(hex_code, contrast=10):
+def mod_color(hex_code, contrast=10):  # add contrast to background image of headshot
     red = int(hex_code[1:3], 16)
     green = int(hex_code[3:5], 16)
     blue = int(hex_code[5:7], 16)
 
-    # Adjusting RGB components by a factor (contrast)
     red = max(0, min(255, red + contrast))
     green = max(0, min(255, green + contrast))
     blue = max(0, min(255, blue + contrast))
 
-    # Generate the adjusted hex code
     adjusted_hex_code = f'#{red:02x}{green:02x}{blue:02x}'
     return adjusted_hex_code
 
 
-def random_pixel(image_url):
+def random_pixel(image_url):  # generate background image of headshot from headshot pixel
     response = requests.get(image_url)
 
     # Check if the request was successful
@@ -63,7 +61,7 @@ if __name__ == '__main__':
 
     team_data = APICalls.get_nfl_teams()
 
-    for team in team_data["body"]:
+    for team in team_data["body"]:  # host all team info in team_dict, primarily to get team logo
         team_abv = team.get("teamAbv")
         team_instance = Team.from_api_response(team)
         team_dict[team_abv] = team_instance
@@ -86,7 +84,7 @@ if __name__ == '__main__':
             index=0
         )
 
-    if APICalls.valid_player(name) is False:
+    if APICalls.valid_player(name) is False:  # handles non-players and non-inputs
         if name == "":
             st.write()
         else:
@@ -125,13 +123,15 @@ if __name__ == '__main__':
                 """,
                 unsafe_allow_html=True
             )
-        # Applying some formatting options
+
         st.markdown("<hr>", unsafe_allow_html=True)  # Adding a horizontal rule for separation
 
         with col3:
             st.image(team_dict[player.team].espnLogo1, width=80)
 
         completed_team_games, all_team_games = APICalls.store_team_games(player.team)
+
+        # establish positional dataframes
 
         if player.pos == "RB":
             table_data = pd.DataFrame(
@@ -216,11 +216,13 @@ if __name__ == '__main__':
                 }
             )
 
-        st.dataframe(table_data, hide_index=True)
+        #generate table
+
+        st.dataframe(table_data)
 
         st.markdown("<hr>", unsafe_allow_html=True)  # Adding a horizontal rule for separation
 
-        player_stats_dict = {
+        player_stats_dict = {  # allow variable inputs based on dropdown
             "Points": player.fantasy_points,
             "Targets": player.targets,
             "Receptions": player.receptions,
@@ -242,7 +244,7 @@ if __name__ == '__main__':
             "Interceptions": player.interceptions,
         }
 
-        option = st.selectbox(
+        option = st.selectbox(  # dropdown menu
             "What would you like to sort by?",
             (list(player_stats_dict.keys())),
             label_visibility="collapsed",
@@ -257,7 +259,7 @@ if __name__ == '__main__':
             }
         )
 
-        news_list = APICalls.player_news_stack(player)
+        news_list = APICalls.player_news_stack(player, option, player_stats_dict)
         clickable_df = pd.DataFrame(news_list, columns=["Gameweek", "Points", "title", "link"])
 
         tab1, tab2, tab3 = st.tabs([f"{option} Per Week", "Scatterplot", "Player Comparison"])

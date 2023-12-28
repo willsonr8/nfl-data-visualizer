@@ -1,4 +1,3 @@
-import json
 class Player_Info:
     def __init__(self, name, ID, pos, headshot, team, num, age, free_agent):
         self.name = name

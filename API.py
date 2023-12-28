@@ -113,13 +113,12 @@ class APICalls:
         for game in player_games:
             if game not in seen_games:
 
-                if int(game[0:8]) > 20230827:  # should be a way to clean this up
+                if int(game[0:8]) > 20230827:  # acts as a date comparison
                     game_week = cls.get_game_week(game)
 
                     if game_week <= len(fantasy_points):
                         fantasy_points[game_week - 1] = float(parsed_data["body"][game]["fantasyPointsDefault"][f"{scoring_type}"])
 
-                    # Assign lists to player attributes
         player.fantasy_points = fantasy_points
 
     @classmethod
@@ -404,7 +403,7 @@ class APICalls:
         return game_week
 
     @classmethod
-    def player_news_stack(cls, player):
+    def player_news_stack(cls, player, option, option_dict):
         parsed_data = cls.get_player_news(player.ID)
         news_dict = []
         for news in parsed_data["body"]:
@@ -417,7 +416,7 @@ class APICalls:
                 if week_substr.isdigit():
                     week_number = int(week_substr)
             if week_number and 1 <= week_number <= 18:
-                news_dict.append((week_number, player.fantasy_points[week_number - 1], real_title, link))
+                news_dict.append((week_number, option_dict[option][week_number - 1], real_title, link))
         return news_dict
 
 
